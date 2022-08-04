@@ -6,10 +6,10 @@ import window from 'global/window';
 // Default options for the plugin.
 const defaults = {
   fullscreen: {
-    enterOnRotate: true,
-    exitOnRotate: true,
-    lockOnRotate: true,
-    lockToLandscapeOnEnter: false,
+    enterOnRotate: false,
+    exitOnRotate: false,
+    lockOnRotate: false,
+    lockToLandscapeOnEnter: true,
     iOS: false,
     disabled: false
   },
@@ -113,8 +113,7 @@ const onPlayerReady = (player, options) => {
     if (currentOrientation === 'landscape' && options.fullscreen.enterOnRotate) {
       if (player.paused() === false) {
         player.requestFullscreen();
-        if ((options.fullscreen.lockOnRotate || options.fullscreen.lockToLandscapeOnEnter) &&
-            screen.orientation && screen.orientation.lock) {
+        if (options.fullscreen.lockOnRotate && screen.orientation && screen.orientation.lock) {
           screen.orientation.lock('landscape').then(() => {
             locked = true;
           }).catch((e) => {
@@ -154,13 +153,6 @@ const onPlayerReady = (player, options) => {
         videojs.log('Browser refused orientation lock:', e);
       });
     } else if (!player.isFullscreen() && locked) {
-      screen.orientation.unlock();
-      locked = false;
-    }
-  });
-
-  player.on('ended', _ => {
-    if (locked === true) {
       screen.orientation.unlock();
       locked = false;
     }
